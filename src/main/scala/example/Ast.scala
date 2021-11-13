@@ -61,6 +61,7 @@ object Ast:
   def int(i: Int): E = IntegerLiteral(i)
   def assign(name: String, exp: E): E = Assignment(name, exp)
   def ident(name: String) = Identifier(name)
+  def $(name: String) = ident(name)
   def block(exps: E*): E = Block(exps)
   def `while`(cond: E, body: E): E = While(cond, body)
   def `if`(cond: E, `then`: E, `else`: E): E = If(cond, `then`, Some(`else`))
