@@ -14,6 +14,12 @@ class Interpreter:
         case Sub => lhsInterpreted - rhsInterpreted
         case Mul => lhsInterpreted * rhsInterpreted
         case Div => lhsInterpreted / rhsInterpreted
+        case LT  => if (lhsInterpreted < rhsInterpreted) 1 else 0
+        case LEQ => if (lhsInterpreted <= rhsInterpreted) 1 else 0
+        case GT  => if (lhsInterpreted > rhsInterpreted) 1 else 0
+        case GEQ => if (lhsInterpreted >= rhsInterpreted) 1 else 0
+        case EQ  => if (lhsInterpreted == rhsInterpreted) 1 else 0
+        case NEQ => if (lhsInterpreted != rhsInterpreted) 1 else 0
     }
     case IntegerLiteral(lit) => lit
     case Assignment(name, value) => {
@@ -22,3 +28,17 @@ class Interpreter:
       intval
     }
     case Identifier(name) => env(name)
+    case If(cond, thenExpr, elseExpr) => {
+      val condInterpreted = interpret(cond)
+      if (condInterpreted != 0) interpret(thenExpr)
+      else elseExpr.map(interpret).getOrElse(1)
+    }
+    case While(cond, body) => {
+      var condInterpreted = interpret(cond)
+      while (condInterpreted != 0) {
+        interpret(body)
+        condInterpreted = interpret(cond)
+      }
+      1
+    }
+    case Block(exprs) => exprs.map(interpret).last
