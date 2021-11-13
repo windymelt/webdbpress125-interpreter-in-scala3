@@ -66,7 +66,7 @@ class Interpreter:
     }
     case Block(exprs) => exprs.map(interpret).last
     case FunctionCall(name, args) => {
-      println("call function: " + name)
+      //print("call function: " + name)
       val fd = functionEnvironment.get(name)
       fd.match
         case Some(fd) => {
@@ -80,7 +80,7 @@ class Interpreter:
             }
             .toMap
           parameterMap.foreach { case (name, value) =>
-            println(name + ": " + value)
+          //print(" " + name + ": " + value)
           }
           val backupEnv = env
           env = Env(parameterMap, Some(env))
@@ -89,7 +89,7 @@ class Interpreter:
             sys.exit(1)
           }
           stackCounter += 1
-          println("stackCounter: " + stackCounter)
+          //println(" stackCounter: " + stackCounter)
           val result = interpret(body)
           stackCounter -= 1
           env = backupEnv

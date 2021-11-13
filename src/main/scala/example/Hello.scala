@@ -9,9 +9,41 @@ object Hello extends App:
       "main",
       Seq(),
       block(
-        ident("a") := int(5),
-        call("factorial", ident("a")),
-        call("infiniteLoop")
+        ident("x") := int(12),
+        ident("y") := int(6),
+        ident("z") := int(0),
+        call("tarai", ident("x"), ident("y"), ident("z"))
+      )
+    ),
+    defun(
+      "tarai",
+      Seq("x", "y", "z"),
+      block(
+        `if`(
+          ident("x") <= ident("y"),
+          ident("y"),
+          block(
+            ident("a") := call(
+              "tarai",
+              ident("x") - int(1),
+              ident("y"),
+              ident("z")
+            ),
+            ident("b") := call(
+              "tarai",
+              ident("y") - int(1),
+              ident("z"),
+              ident("x")
+            ),
+            ident("c") := call(
+              "tarai",
+              ident("z") - int(1),
+              ident("x"),
+              ident("y")
+            ),
+            call("tarai", ident("a"), ident("b"), ident("c"))
+          )
+        )
       )
     ),
     defun("infiniteLoop", Seq(), call("infiniteLoop")),
