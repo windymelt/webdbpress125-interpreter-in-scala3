@@ -5,6 +5,7 @@ class Interpreter:
   import Ast.Expression.*
   import Ast.TopLevel.*
   import Ast.Env
+  var stackCounter = 0
   var env = Env(Map(), None)
   val functionEnvironment =
     scala.collection.mutable.Map[String, FunctionDefinition]()
@@ -83,7 +84,14 @@ class Interpreter:
           }
           val backupEnv = env
           env = Env(parameterMap, Some(env))
+          if (stackCounter > 100) {
+            println("stack overflow")
+            sys.exit(1)
+          }
+          stackCounter += 1
+          println("stackCounter: " + stackCounter)
           val result = interpret(body)
+          stackCounter -= 1
           env = backupEnv
           result
         }

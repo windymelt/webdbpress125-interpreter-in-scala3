@@ -10,9 +10,11 @@ object Hello extends App:
       Seq(),
       block(
         ident("a") := int(5),
-        call("factorial", ident("a"))
+        call("factorial", ident("a")),
+        call("infiniteLoop")
       )
     ),
+    defun("infiniteLoop", Seq(), call("infiniteLoop")),
     defun("triple", Seq("x"), ident("x") * int(3)),
     defun(
       "factorial",
