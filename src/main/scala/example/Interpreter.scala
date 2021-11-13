@@ -3,7 +3,26 @@ package example
 class Interpreter:
   import Ast.Expression
   import Ast.Expression.*
-  val env = scala.collection.mutable.Map[String, Int]()
+  import Ast.TopLevel.*
+  import Ast.Env
+  var env = Env(Map(), None)
+  val functionEnvironment =
+    scala.collection.mutable.Map[String, FunctionDefinition]()
+
+  def callMain(program: Ast.Program): Int = {
+    val toplevels = program.definitions
+    for (toplevel <- toplevels) {
+      toplevel match
+        case fd @ FunctionDefinition(name, parameters, body) =>
+          functionEnvironment.put(name, fd)
+        case GlobalValiableDefinition(name, value) =>
+          env = Env(env.bindings.updated(name, interpret(value)), None)
+    }
+    functionEnvironment.get("main") match
+      case Some(fd) => interpret(fd.body)
+      case None     => throw new Exception("main function not found")
+  }
+
   def interpret(expression: Expression): Int = expression match
     case BinaryExpression(op, lhs, rhs) => {
       val lhsInterpreted: Int = interpret(lhs)
@@ -24,10 +43,13 @@ class Interpreter:
     case IntegerLiteral(lit) => lit
     case Assignment(name, value) => {
       val intval = interpret(value)
-      env(name) = intval
+      env = env.copy(bindings = env.bindings.updated(name, intval))
       intval
     }
-    case Identifier(name) => env(name)
+    case Identifier(name) =>
+      env.findBinding(name) match
+        case Some(binding) => binding(name)
+        case None          => throw new Exception("undefined variable: " + name)
     case If(cond, thenExpr, elseExpr) => {
       val condInterpreted = interpret(cond)
       if (condInterpreted != 0) interpret(thenExpr)
@@ -42,3 +64,28 @@ class Interpreter:
       1
     }
     case Block(exprs) => exprs.map(interpret).last
+    case FunctionCall(name, args) => {
+      println("call function: " + name)
+      val fd = functionEnvironment.get(name)
+      fd.match
+        case Some(fd) => {
+          val actualParams = args
+          val formalParams = fd.parameters
+          val body = fd.body
+          val parameterMap: Map[String, Int] = formalParams
+            .zip(actualParams)
+            .map { case (formalName, actual) =>
+              formalName -> interpret(actual)
+            }
+            .toMap
+          parameterMap.foreach { case (name, value) =>
+            println(name + ": " + value)
+          }
+          val backupEnv = env
+          env = Env(parameterMap, Some(env))
+          val result = interpret(body)
+          env = backupEnv
+          result
+        }
+        case None => throw new Exception("function not found")
+    }

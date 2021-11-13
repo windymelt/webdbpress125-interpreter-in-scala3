@@ -1,6 +1,14 @@
 package example
 
 object Ast:
+  case class Program(definitions: Seq[TopLevel])
+  enum TopLevel:
+    case GlobalValiableDefinition(name: String, value: Expression)
+    case FunctionDefinition(
+        name: String,
+        parameters: Seq[String],
+        body: Expression
+    )
   enum Expression:
     case BinaryExpression(operator: Ops, lhs: Expression, rhs: Expression)
     case IntegerLiteral(value: Int)
@@ -13,6 +21,7 @@ object Ast:
         `then`: Expression,
         `else`: Option[Expression] = None
     )
+    case FunctionCall(name: String, arguments: Seq[Expression])
 
   case class Env(bindings: Map[String, Int], next: Option[Env]):
     def findBinding(name: String): Option[Map[String, Int]] =
@@ -56,6 +65,12 @@ object Ast:
   def `while`(cond: E, body: E): E = While(cond, body)
   def `if`(cond: E, `then`: E, `else`: E): E = If(cond, `then`, Some(`else`))
   def `if`(cond: E, `then`: E): E = If(cond, `then`)
+  def defun(name: String, params: Seq[String], body: E): TopLevel =
+    TopLevel.FunctionDefinition(name, params, body)
+  def defvar(name: String, value: E): TopLevel =
+    TopLevel.GlobalValiableDefinition(name, value)
+  def program(defs: TopLevel*): Program = Program(defs)
+  def call(name: String, args: E*): E = FunctionCall(name, args)
 
   // Syntax sugar
   extension (self: E)
@@ -67,7 +82,7 @@ object Ast:
     def <=(rhs: E): E = leq(self, rhs)
     def >(rhs: E): E = gt(self, rhs)
     def >=(rhs: E): E = geq(self, rhs)
-    def ==(rhs: E): E = eq(self, rhs)
+    def ===(rhs: E): E = eq(self, rhs)
     def !=(rhs: E): E = neq(self, rhs)
     def :=(rhs: E): E = self match {
       case Identifier(name) => assign(name, rhs)
