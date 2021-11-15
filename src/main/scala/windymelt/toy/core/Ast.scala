@@ -75,6 +75,9 @@ object Ast:
     TopLevel.GlobalValiableDefinition(name, value)
   def program(defs: TopLevel*): Program = Program(defs)
   def call(name: String, args: E*): E = FunctionCall(name, args)
+  def unary(operand: E): E = UnaryExpression(None, operand)
+  def unary(operator: Ops, operand: E): E =
+    UnaryExpression(Some(operator), operand)
 
   // Syntax sugar
   extension (self: E)

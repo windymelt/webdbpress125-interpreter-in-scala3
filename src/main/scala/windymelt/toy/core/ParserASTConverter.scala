@@ -60,12 +60,10 @@ object ParserASTConverter {
       ast match {
         case parser.Comparative(additive, next) =>
           next match {
-            case Seq() =>
-              Expression.UnaryExpression(None, additive)
+            case Seq() => additive
             case seq =>
-              seq.foldLeft(Expression.UnaryExpression(None, additive))(
-                (lhs, moreNext) =>
-                  Expression.BinaryExpression(moreNext._1, lhs, moreNext._2)
+              seq.foldLeft(additive: Expression)((lhs, moreNext) =>
+                Expression.BinaryExpression(moreNext._1, lhs, moreNext._2)
               )
           }
       }
@@ -73,12 +71,10 @@ object ParserASTConverter {
     ast match {
       case parser.Additive(multiplicative, next) =>
         next match {
-          case Seq() =>
-            Expression.UnaryExpression(None, multiplicative)
+          case Seq() => multiplicative
           case seq =>
-            seq.foldLeft(Expression.UnaryExpression(None, multiplicative))(
-              (lhs, moreNext) =>
-                Expression.BinaryExpression(moreNext._1, lhs, moreNext._2)
+            seq.foldLeft(multiplicative: Expression)((lhs, moreNext) =>
+              Expression.BinaryExpression(moreNext._1, lhs, moreNext._2)
             )
         }
     }
@@ -87,12 +83,10 @@ object ParserASTConverter {
       ast match {
         case parser.Multiplicative(unary, next) =>
           next match {
-            case Seq() =>
-              Expression.UnaryExpression(None, unary)
+            case Seq() => unary
             case seq =>
-              seq.foldLeft(Expression.UnaryExpression(None, unary))(
-                (lhs, moreNext) =>
-                  Expression.BinaryExpression(moreNext._1, lhs, moreNext._2)
+              seq.foldLeft(unary: Expression)((lhs, moreNext) =>
+                Expression.BinaryExpression(moreNext._1, lhs, moreNext._2)
               )
           }
       }

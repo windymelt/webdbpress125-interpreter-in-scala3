@@ -40,7 +40,10 @@ case class FunctionDefinition(
     body: BlockExpression
 ) extends TopLevelDefinition
 case class Op(op: String)
-case class Comparative(additive: Additive, next: Seq[(Op, Additive)]) {
+case class Comparative(
+    additive: Additive,
+    next: Seq[(Op, Additive)] = Seq.empty
+) {
   override def toString = {
     val sb = new StringBuilder
     sb.append(additive)
@@ -53,7 +56,7 @@ case class Comparative(additive: Additive, next: Seq[(Op, Additive)]) {
 }
 case class Additive(
     multiplicative: Multiplicative,
-    next: Seq[(Op, Multiplicative)]
+    next: Seq[(Op, Multiplicative)] = Seq.empty
 ) {
   override def toString = {
     val sb = new StringBuilder
@@ -65,7 +68,7 @@ case class Additive(
     sb.toString()
   }
 }
-case class Multiplicative(unary: Unary, next: Seq[(Op, Unary)]) {
+case class Multiplicative(unary: Unary, next: Seq[(Op, Unary)] = Seq.empty) {
   override def toString = {
     val sb = new StringBuilder
     sb.append(unary)
