@@ -5,6 +5,7 @@ class Interpreter:
   import Ast.Expression.*
   import Ast.TopLevel.*
   import Ast.Env
+  val StackMaxCount = 10000
   var stackCounter = 0
   var env = Env(Map(), None)
   val functionEnvironment =
@@ -40,6 +41,10 @@ class Interpreter:
         case GEQ => if (lhsInterpreted >= rhsInterpreted) 1 else 0
         case EQ  => if (lhsInterpreted == rhsInterpreted) 1 else 0
         case NEQ => if (lhsInterpreted != rhsInterpreted) 1 else 0
+        case Neg =>
+          throw new Exception(
+            "not implemented"
+          ) // Neg cannot be appeared in the BinaryExpression
     }
     case UnaryExpression(op, rhs) => {
       val rhsInterpreted: Int = interpret(rhs)
@@ -47,6 +52,10 @@ class Interpreter:
       op match
         case Some(Neg) => -rhsInterpreted
         case None      => rhsInterpreted
+        case Some(_) =>
+          throw new Exception(
+            "not implemented"
+          ) // Other than Neg cannot be appeared in the UnaryExpression
     }
     case IntegerLiteral(lit) => lit
     case Assignment(name, value) => {
@@ -73,7 +82,6 @@ class Interpreter:
     }
     case Block(exprs) => exprs.map(interpret).last
     case FunctionCall(name, args) => {
-      //print("call function: " + name)
       val fd = functionEnvironment.get(name)
       fd.match
         case Some(fd) => {
@@ -91,7 +99,7 @@ class Interpreter:
           }
           val backupEnv = env
           env = Env(parameterMap, Some(env))
-          if (stackCounter > 100) {
+          if (stackCounter > StackMaxCount) {
             println("stack overflow")
             sys.exit(1)
           }

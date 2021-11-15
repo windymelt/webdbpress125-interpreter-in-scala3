@@ -9,7 +9,15 @@ object Hello extends App:
   import windymelt.toy.parser.ASTParser
   val code = """
   define main() {
-    println(1 + 2)
+    println(tarai(12,6,0))
+  }
+  define tarai(x, y, z) {
+    if (x <= y) { y; }
+    else {
+      tarai(tarai(x - 1, y, z),
+            tarai(y - 1, z, x),
+            tarai(z - 1, x, y));
+    }
   }
   """.strip
   val p: Option[Seq[TopLevelDefinition]] = ASTParser(code)
@@ -19,51 +27,9 @@ object Hello extends App:
   val pp: Option[Program] = p.map { given_Conversion_Seq_Program }
   println(pp)
 
-  p match {
+  println("*** running program ***")
+
+  p match
     case Some(prog) =>
       Interpreter().callMain(prog)
     case None => println("parse error")
-  }
-//Interpreter().callMain(p)
-
-// val p = program(
-//   defun(
-//     "main",
-//     Seq(),
-//     block(
-//       $("x") := int(6),
-//       $("y") := int(3),
-//       $("z") := int(0),
-//       call("tarai", $("x"), $("y"), $("z"))
-//     )
-//   ),
-//   defun(
-//     "tarai",
-//     Seq("x", "y", "z"),
-//     `if`(
-//       $("x") <= $("y"),
-//       $("y"),
-//       block(
-//         $("a") := call("tarai", $("x") - int(1), $("y"), $("z")),
-//         $("b") := call("tarai", $("y") - int(1), $("z"), $("x")),
-//         $("c") := call("tarai", $("z") - int(1), $("x"), $("y")),
-//         call("tarai", $("a"), $("b"), $("c"))
-//       )
-//     )
-//   ),
-//   defun("infiniteLoop", Seq(), call("infiniteLoop")),
-//   defun("triple", Seq("x"), $("x") * int(3)),
-//   defun(
-//     "factorial",
-//     Seq("x"),
-//     block(
-//       `if`(
-//         $("x") === int(1),
-//         int(1),
-//         $("x") * call("factorial", $("x") - int(1))
-//       )
-//     )
-//   )
-// )
-
-//println(Interpreter().callMain(p))

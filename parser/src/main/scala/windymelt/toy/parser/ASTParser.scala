@@ -259,7 +259,11 @@ class ASTParser(val input: ParserInput) extends Parser {
 
   def functionCall: Rule1[FunctionCall] = rule {
     identifier ~ "(" ~ ws ~ zeroOrMore(
-      (expression ~ zeroOrMore("," ~ ws ~ expression) ~> { (l, r) => r.:+(l) })
+      (expression ~ zeroOrMore("," ~ ws ~ expression) ~> { (arg, args) =>
+        arg +: args
+      }) ~> { (args) =>
+        args
+      }
     ) ~ ws ~> { (l, r) => FunctionCall(l, r.flatten) } ~ ")" ~ ws
   }
 

@@ -9,7 +9,6 @@ object ParserASTConverter {
 
   given Conversion[Seq[parser.TopLevelDefinition], Program] =
     (t: Seq[parser.TopLevelDefinition]) => {
-      println("converting toplevel")
       Program(t.map(_ match {
         case g: parser.GlobalVariableDefinition =>
           given_Conversion_GlobalVariableDefinition_GlobalValiableDefinition(g)
@@ -29,10 +28,9 @@ object ParserASTConverter {
     }
   given Conversion[parser.FunctionDefinition, TopLevel.FunctionDefinition] with
     def apply(ast: parser.FunctionDefinition) = {
-      println("converting function")
-      TopLevel.FunctionDefinition(
+      windymelt.toy.core.Ast.TopLevel.FunctionDefinition(
         ast.name.name,
-        ast.parameters,
+        ast.args.map(_.name),
         ast.body
       )
     }
@@ -122,7 +120,6 @@ object ParserASTConverter {
         val convertedElseBody: Option[Expression] = elseBody.map(identity)
         Expression.If(condition, body, convertedElseBody)
       case parser.BlockExpression(expressions) =>
-        println("converting block")
         val linestoSeqExp: Seq[Expression] = expressions.map(identity)
         Expression.Block(linestoSeqExp)
     }

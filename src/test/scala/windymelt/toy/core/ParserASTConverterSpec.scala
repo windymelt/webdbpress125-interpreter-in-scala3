@@ -147,4 +147,30 @@ class ParserASTConverterSpec extends AnyFlatSpec with Matchers {
     )
     ast shouldBe call("f", unary(int(42)))
   }
+
+  "Function Definition Converter" should "convert function definition" in {
+    val ast =
+      ParserASTConverter.given_Conversion_FunctionDefinition_FunctionDefinition(
+        parser.FunctionDefinition(
+          parser.Identifier("f"),
+          Seq.empty,
+          parser.BlockExpression(
+            Seq(
+              parser.ExpressionLine(
+                parser.Expression(
+                  parser.Comparative(
+                    parser.Additive(
+                      parser.Multiplicative(
+                        parser.ConcreteUnary(parser.Integer(42))
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    ast shouldBe defun("f", Seq(), block(unary(int(42))))
+  }
 }
