@@ -1,4 +1,4 @@
-package example
+package windymelt.toy.core
 
 object Ast:
   case class Program(definitions: Seq[TopLevel])
@@ -11,6 +11,7 @@ object Ast:
     )
   enum Expression:
     case BinaryExpression(operator: Ops, lhs: Expression, rhs: Expression)
+    case UnaryExpression(operator: Option[Ops], operand: Expression)
     case IntegerLiteral(value: Int)
     case Assignment(name: String, expression: Expression)
     case Identifier(name: String)
@@ -22,6 +23,7 @@ object Ast:
         `else`: Option[Expression] = None
     )
     case FunctionCall(name: String, arguments: Seq[Expression])
+    case Println(expression: Expression)
 
   case class Env(bindings: Map[String, Int], next: Option[Env]):
     def findBinding(name: String): Option[Map[String, Int]] =
@@ -41,6 +43,7 @@ object Ast:
     case GEQ extends Ops(">=")
     case EQ extends Ops("=")
     case NEQ extends Ops("!=")
+    case Neg extends Ops("-")
 
   import Ast.{Expression => E}
   import E.*

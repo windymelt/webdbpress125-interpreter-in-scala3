@@ -1,4 +1,4 @@
-package example
+package windymelt.toy.core
 
 class Interpreter:
   import Ast.Expression
@@ -40,6 +40,13 @@ class Interpreter:
         case GEQ => if (lhsInterpreted >= rhsInterpreted) 1 else 0
         case EQ  => if (lhsInterpreted == rhsInterpreted) 1 else 0
         case NEQ => if (lhsInterpreted != rhsInterpreted) 1 else 0
+    }
+    case UnaryExpression(op, rhs) => {
+      val rhsInterpreted: Int = interpret(rhs)
+      import Ast.Ops.Neg
+      op match
+        case Some(Neg) => -rhsInterpreted
+        case None      => rhsInterpreted
     }
     case IntegerLiteral(lit) => lit
     case Assignment(name, value) => {
@@ -96,4 +103,9 @@ class Interpreter:
           result
         }
         case None => throw new Exception("function not found")
+    }
+    case Println(expr) => {
+      val intval = interpret(expr)
+      println(intval)
+      intval
     }
